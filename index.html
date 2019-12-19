@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <style type="text/css">
+            div.row {
+                margin: 0;
+                padding: 0;
+                height: 40px;
+            }
+            
+            div.row div {
+                width: 40px;
+                height: 40px;
+                display: inline-block;
+            }
+
+            div#world {
+                display: inline-block;
+                position: relative;
+            }
+
+            body {
+                background-color: black;
+            }
+
+            div.brick {
+                background-color: blue;
+            }
+
+            .coin {
+                background-image: url("truecoin.gif");
+                background-size: 30px;
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+            }
+
+            .cherry {
+                background-image: url("cherry.gif");
+                background-size: 50px;
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+            }
+
+            .ghost {
+                background-image: url("ghost.gif");
+                background-size: 40px;
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+            }
+
+            #pacman {
+                background-image: url("waluigi.png");
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+                width:55px;
+                height:40px;
+                margin-top: 8px;
+                position: absolute;
+            }
+
+            #score {
+                text-align: center;
+                background-size: 800% 800%;
+                -webkit-background-clip: text;
+                color: white;
+                font-size: 24px;
+                background-image: repeating-linear-gradient( 45deg, violet, indigo, blue, green, yellow, orange, red, violet);
+                animation: rainbow 2s ease infinite;
+                display: inline-block;
+            }
+
+            @keyframes rainbow {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 25%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+        
+        </style>
+    </head>
+    <body>
+        <div id='world'></div>
+        <div id='pacman'></div>
+        <div id='score'></div>
+
+
+
+        //List of features
+        // 1) Have JS display the world of brick/coin/etc 
+        // 2) Have the pacman move up and down
+
+        <script>
+
+        var world = [
+            [1,1,1,1,1,1,1,1,1,1],
+            [1,4,2,1,2,2,2,2,2,1],
+            [1,2,2,1,2,2,2,2,2,1],
+            [1,2,2,5,2,2,2,2,2,1],
+            [1,2,2,1,1,1,1,2,2,1],
+            [1,2,2,2,2,2,2,2,2,1],
+            [1,2,2,2,2,2,1,2,2,1],
+            [1,2,2,2,2,2,1,5,6,1],
+            [1,1,1,1,1,1,1,1,1,1],
+        ];
+            // 1) Brick
+            // 2) Coin
+            // 3) Pacman <-- no more
+            // 4) empty
+            // 5) ghost
+            // 6) cherry
+
+        var pacman = {
+            x: 40,
+            y: 40
+        };
+
+        function displayWorld(){
+            var output = '';
+            for(var i=0;i<world.length; i++) {
+                output += "\n<div class='row'>";
+                for(var j=0; j<world[i].length; j++) {
+                    if(world[i][j] == 1) {
+                        output += "<div class='brick'></div>";
+                    }
+                    else if(world[i][j] == 2) {
+                        output += "<div class='coin'></div>";
+                    }
+                    else if(world[i][j] == 4) {
+                        output += "<div class='empty'></div>";
+                    }
+                    else if(world[i][j] == 5) {
+                        output += "<div class='ghost'></div>";
+                    }
+                    else if(world[i][j] == 6) {
+                        output += "<div class='cherry'></div>";
+                    }
+                }
+                output += "</div>";
+            }
+            //console.log(output);
+            document.getElementById('world').innerHTML = output;
+        }
+
+
+        function displayScore(s) {
+            var output = '';
+            if(s == 0) {
+                output = "Get those coins!";
+            }
+            else if(s == 49) {
+                output = "You got all the coins!";
+                document.getElementById('score').style.color = "transparent";
+                document.getElementById('score').style.animation = "rainbow 2s ease infinite";
+                document.getElementById('score').style.fontSize = "13rem";
+                document.getElementById('score').style.position = "absolute";
+                document.getElementById('score').style.left = "0";
+                document.getElementById('score').style.top = "0";
+            }
+            else {
+                output = s*10 + " POINTS!!";
+            }
+            document.getElementById('score').innerHTML = output;
+        }
+
+
+        function displayPacman() {
+            document.getElementById('pacman').style.left = pacman.x+"px";
+            document.getElementById('pacman').style.top = pacman.y+"px";
+            //console.log(pacman.x)
+        }
+
+        function displayDead() {
+            document.getElementById('pacman').style.transform = "rotate(90deg)";
+            isAlive = false
+        }
+
+        displayWorld();
+        displayPacman();
+        var s = 0
+        displayScore(s);
+        var isAlive = true
+
+        document.onkeydown = function(e) {
+            var prevx = pacman.x;
+            var prevy = pacman.y;
+            if (e.keyCode == 37 && isAlive == true) {
+                pacman.x = pacman.x - 40;
+            }
+            else if (e.keyCode == 39 && isAlive == true) {
+                pacman.x = pacman.x + 40;
+            }
+            else if (e.keyCode == 38 && isAlive == true) {
+                pacman.y = pacman.y - 40;
+            }
+            else if (e.keyCode == 40 && isAlive == true) {
+                pacman.y = pacman.y + 40;
+            }
+            
+            var i = pacman.x/40;
+            var j = pacman.y/40;
+
+            if (world[j][i] == 1) {
+                // console.log(pacman)
+                pacman.x = prevx;
+                pacman.y = prevy;
+                // console.log(pacman)
+            }
+            else if(world[j][i] == 5) {
+                displayDead();
+            }
+
+            else if(world[j][i] == 6) {
+                s += 5
+                displayScore(s);
+                world[j][i] = 4;
+                displayWorld();
+            }
+
+            else if (world[j][i] == 2) {
+                s++
+                displayScore(s);
+                world[j][i] = 4;
+                displayWorld();
+            }
+
+            // console.log(i,j)
+            // console.log(world[j][i])
+
+            // console.log(e.keyCode);
+            displayPacman();
+        }
+
+
+
+        </script>
+    </body>
+</html>
